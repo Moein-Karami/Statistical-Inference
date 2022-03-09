@@ -1,0 +1,317 @@
+---
+title: "Lab 1"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+# a) Variables and Types
+
+## 1:
+
+There is no difference
+
+## 2:
+
+logical, integer, real, complex, string,
+
+## 3:
+
+```{r}
+4 + T
+```
+
+```{r}
+#4 + "false"
+```
+
+## 4:
+
+sum is not int the boolean format because '+' is an operation for numeric data types.
+
+```{r}
+sum <- T + F
+sum
+typeof(sum)
+sum <- as.logical(sum)
+typeof(sum)
+sum
+```
+
+# b) Data structures
+
+## 5:
+
+Vector, list, matrix, data frame, factors
+
+# c) Vectors
+
+## 6:
+
+```{r}
+vec <- c(1, 2, 3)
+vec
+```
+
+## 7:
+
+We can't put variables of different types in a vector, since a vector is a random variable, so all variables in a vector must have the same type.
+
+## 8:
+
+```{r}
+feature_1 <- c(50 : 250)
+feature_1
+```
+
+## 9:
+
+```{r}
+length(feature_1)
+```
+
+## 10:
+
+```{r}
+mean(feature_1)
+var(feature_1)
+sd(feature_1)
+median(feature_1)
+```
+
+## 11:
+
+```{r}
+plot(feature_1)
+```
+
+## 12:
+
+```{r}
+a <- feature_1[6 : 22]
+a
+```
+
+## 13:
+
+```{r}
+b <- feature_1[c(6, 13, 21, 22, 43)]
+b
+```
+
+## 14:
+
+```{r}
+c <- c(a, b)
+c
+```
+
+## 15:
+
+```{r}
+find_a <- function(str){
+  return (grepl("a", str))
+}
+
+str <- c("joey", "phoebe", "monica", "chandler", "ross", "rachel")
+sum(as.integer(lapply(str, find_a)))
+
+```
+
+# d) Factors
+
+## 16:
+
+Factor in R is **a variable used to categorize and store the data, having a limited number of different values**.
+
+Factors have limited number of different values, while vectors don't have any limitation.
+
+```{r}
+directions <- c("West", "East", "East", "North", "West", "West")
+feature_2 <- factor (directions)
+```
+
+## 17:
+
+It isn't possible, because 'South' isn't one of feature_2's levels.
+
+## 18:
+
+```{r}
+levels(feature_2) <- c(levels(feature_2), "South")
+feature_2
+```
+
+## 19:
+
+There is nothing important to report, everything works well.
+
+```{r}
+feature_2[1] <- "South"
+feature_2
+```
+
+# e) Missing values
+
+## 20:
+
+NA
+
+## 21:
+
+```{r}
+feature_1[1] <- NA
+feature_1
+```
+
+## 22:
+
+mean() function can't calculate feature_1's mean and returns NaN because first element of this vector is missing.
+
+We can set "na.rm" argument, true in mean() function to resolve this problem.
+
+```{r}
+mean(feature_1, na.rm = T)
+```
+
+## 23:
+
+```{r}
+feature_1[43] <- NA
+which(is.na(feature_1))
+```
+
+## 24:
+
+**NULL represents the null object in R**. NULL is used mainly to represent the lists with zero length, and is often returned by expressions and functions whose value is undefined.
+
+# f) Lists
+
+## 25:
+
+List is a list of variables which types could be different.
+
+## 26:
+
+list [x] will return a list which only contains the x_th element of list, while list [[x]] will return x_th element of list, it self.
+
+```{r}
+lst <- list(4, 5, 6, list(7, 8, "xyz"))
+```
+
+# g) Naming
+
+```{r}
+named_list <- list(a = 1, b = 2, c = 3, d = c(4, 5, 6, 7))
+```
+
+## 27:
+
+First one returns a list contains 2, while other ones returns 2 itself.
+
+it is a syntax sugar for [[]] because they both do the same thing.
+
+```{r}
+named_list["b"]
+
+```
+
+```{r}
+named_list[["b"]]
+```
+
+```{r}
+named_list$b
+
+```
+
+# h) Data Frames
+
+## 28:
+
+```{r}
+ncol(Orange)
+```
+
+## 29:
+
+```{r}
+nrow(Orange)
+```
+
+## 30:
+
+```{r}
+f3 <- Orange$circumference
+f3_tmp <- Orange[[3]]
+```
+
+## 31:
+
+f3 is a vector.
+
+Due to the dipersion of circumference feature, this data set had been chosen randomly.
+
+```{r}
+table(f3)
+```
+
+## 32:
+
+Tree feature is catagorical
+
+```{r}
+str(Orange)
+```
+
+## 33:
+
+```{r}
+s29 <- Orange[29, ]
+s29
+```
+
+## 34:
+
+It is a data frame with one row.
+
+## 35:
+
+```{r}
+Orange[c(Orange$Tree == 3), ]
+```
+
+## 36:
+
+```{r}
+tmp <- Orange[1 : 10, c("Tree", "age")]
+tmp
+```
+
+## 37:
+
+```{r}
+median(Orange$age)
+```
+
+# i) Export and Import
+
+## 38:
+
+```{r}
+df_1 <- tail(Orange, n = 15)
+
+```
+
+## 39:
+
+```{r}
+write.csv(df_1, "df_1.csv", row.names = F)
+```
+
+## 40:
+
+```{r}
+df_2 <- read.csv("df_1.csv")
+df_2
+```

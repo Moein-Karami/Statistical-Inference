@@ -1,0 +1,202 @@
+------------------------------------------------------------------------
+
+title: "Data Visualization"
+
+author: "Moein Karami"
+
+date: "3/9/2022"
+
+output:
+
+pdf_document: default
+
+html_document: default
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# a) Simple Plots
+
+## 1)
+
+```{r}
+x <- seq(-3, 3, by = 0.001)
+plot(x, dnorm(x, mean = 0, sd = 1), type = 'l', ylab = 'p(x)')
+```
+
+## 2)
+
+Samples with larger size are closer to real distribution.
+
+```{r}
+for (i in c(5, 10, 100, 1000))
+{  
+  hist(rnorm(i), xlab = 'x', freq = FALSE)
+}
+```
+
+## 3)
+
+```{r}
+x = seq(-5, 5, by = 0.01)
+y1= dt(x, df = 1)
+y2 = dt(x, df = 2)
+y5 = dt(x, df = 5)
+y10 = dt(x, df = 10)
+
+plot(x, y1, type = 'l', col = 'blue', lwd = 5, ylim = c(0, 0.5))
+lines(x, y2, col = 'red')
+lines(x, y5, col = 'purple')
+lines(x, y10)
+legend(x = -5, y = 0.5, legend = c('y1', 'y2', 'y5', 'y10'), col = c('blue', 'red', 'purple', 'black'), ncol = 1, pch = c('l', 'l', 'l', 'l'))
+```
+
+# b) QQ-Plots, Histograms, Box-Plots and Pie-Charts
+
+## 4)
+
+As you can see these two plots are not very similar and precip data-set is not quite symmetric and has a heavy tail, so it does not have a normal distubition.
+
+```{r}
+x = seq(0, 1, by = 0.001)
+y = dnorm(x, mean = 0, sd = 1)
+
+plot(x, quantile(precip, probs = x), type = 'l')
+plot(x, quantile(y, probs = x), type = 'l')
+```
+
+## 5)
+
+For this specific vector, the histogram with 13 bins visualizes the data more appropriately. In the first and last histogram due to low number of bins we can't recognize any distribution and in the third histogram due to large number of bins, we actually see the original data and each bin is representative of very limited range of data.
+
+```{r}
+par(mfrow = c(2, 2))
+hist(precip, breaks = 7, main = 'bins = 7')
+hist(precip, breaks = 13, main = 'breaks = 13')
+hist(precip, breaks = 30, main = 'breaks = 30')
+hist(precip, breaks = seq(min(precip), max(precip) + 13, by = 13), main = 'breaks width = 13')
+```
+
+## 6)
+
+```{r}
+par(mfrow = c(2, 2))
+for (i in c(7, 13, 30))
+{
+    hist(precip, breaks = i, main = sprintf('bins = %d', i), prob = T, col = 'light blue')
+    lines(density(precip), col = 'red', lwd = 3 )
+    grid(nx = NA, ny = NULL, lty = 2, col = "gray", lwd = 1)
+}
+
+hist(precip, breaks = seq(min(precip), max(precip) + 13, by = 13), main = 'breaks width = 13', prob = T, col = 'light blue')
+lines(density(precip), col = 'red', lwd = 3 )
+grid(nx = NA, ny = NULL, lty = 2, col = "gray", lwd = 1)
+```
+
+## 7)
+
+This distribution is very right skewed.
+
+```{r}
+boxplot(rivers)
+```
+
+## 8)
+
+You can see whiskers and outliners below.
+
+```{r}
+box <- boxplot(rivers)
+box
+```
+
+## 9)
+
+```{r}
+rivers_cat = ifelse(rivers < 500, 'tiny', ifelse(rivers < 1500, 'short',
+                                                 ifelse(rivers < 3000, 'medium',
+                                                        'long')))
+
+# install.packages('lessR')
+library(lessR)
+PieChart(rivers_cat, hole = 0, main = 'Rivers')
+```
+
+## 10)
+
+This command results boxplots of "displ vs class".
+
+In general, the tilde ('\~') separates the left side of a formula with the right side of the formula.
+
+For example, in a linear function, it would separate the dependent variable from the independent variables and can be interpreted as saying, "as a function of."
+
+In this command we considered mpg\$displ as a function of mpg\$class and then draw box plot for each class based on ditribution of displ.
+
+```{r}
+library(ggplot2)
+boxplot(mpg$displ ~ mpg$class)
+```
+
+# c) ggplot2
+
+## 11)
+
+```{r}
+library(ggplot2)
+ggplot(Orange, aes(x = Orange$age, y = Orange$circumference)) +
+  geom_point()
+```
+
+## 12)
+
+```{r}
+ggplot(Orange, aes(x = age, y = circumference)) +
+  geom_point(aes(color = Tree)) + scale_color_manual(values=c("blue", "red", "green", "orange", "purple"))
+```
+
+## 13)
+
+**method = "loess"**: This is the default value for small number of observations. It computes a smooth local regression.
+
+```{r}
+ggplot(Orange, aes(age, circumference)) + geom_smooth()
+```
+
+## 14)
+
+```{r}
+Orange$AgeGroup <- ifelse(Orange$age <= 250, 'Young',
+                          ifelse(Orange$age <= 950, 'Adult', 'Old'))
+
+ggplot(Orange, aes(x = AgeGroup, y = circumference, fill = Tree), main = 'Growth of Orange Trees') +
+  geom_bar(stat = 'identity', position = 'dodge') +
+  coord_flip() +
+  theme(panel.border = element_rect(color = 'black', fill = NA, size = 1), plot.margin = unit(c(5, 20, 40, 20), "pt"), plot.title = element_text(hjust = 0, size = 16), plot.background = element_rect(fill = NA, color = "black", size = 2)) +
+  labs(title = "Growth of Orange Trees")
+```
+
+# d) ggmap
+
+## 15)
+
+```{r}
+data(state)
+centers_df <- data.frame(state.center)
+centers_df
+```
+
+## 16)
+
+We should pay money for this one.
+
+```{r}
+library(ggplot2)
+library(ggmap)
+library(qmap)
+ggmap::register_google(key = "AIzaSyAIPS2fbBhllG0dZphsaPmPFluVwMnLoVg")
+#usa = qmap('usa')
+#ggmap(usa)
+```

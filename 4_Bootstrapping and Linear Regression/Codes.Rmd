@@ -1,0 +1,215 @@
+---
+title: "Bootstraping_Regrission"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+# a) Bootstrapping
+
+## 1)
+
+```{r}
+data = airquality$Solar.R
+boot_sample = as.list(as.data.frame(replicate(1000, sample(data, 500, replace = T))))
+med_sample = (sapply(boot_sample, median, na.rm = T))
+```
+
+## 2)
+
+We simply delete first and last 5% of data, remaining data represent the 90% confidence interval.
+
+```{r}
+quantile(med_sample, c(0.05, 0.95))
+```
+
+## 3)
+
+```{r}
+med = median(med_sample)
+se = sd(med_sample)
+err = qt(0.9, length(med_sample) - 1)
+ci = c(med - se * err, med + se * err)
+ci
+```
+
+## 4)
+
+Those are almost equal, I prefer second method
+
+## 5)
+
+There is a problem in loading inference.
+
+# b) Simulation
+
+## 6)
+
+```{r}
+library(msme)
+library(COUNT)
+ships$Risk <- ifelse(ships$incidents < 10, 'Low', 'High')
+```
+
+## 7)
+
+Yes, it does.
+
+But I can't perform a simulation ;-(
+
+## 8)
+
+No, it isn't. It is obvious which type B ships count as High Risk ships.
+
+conditions are not satisfied, we need a sample which size be at least 30.
+
+# c) Linear Regression, Multiple Linear Regression
+
+## 9)
+
+There is probably a relation between these two variables, but it isn't obvious in this plot. I think it's not possible to say that just by looking at the plot.
+
+```{r}
+library(mosaicData)
+plot(Galton$height, Galton$father)
+```
+
+## 10)
+
+These variables have low correlation so, we couldn't say that there is a strong relation.
+
+```{r}
+cor(Galton$height, Galton$father)
+```
+
+## 11)
+
+It's showing that how much height of father impacts on child height.
+
+```{r}
+lm(Galton$height ~ Galton$father, data = Galton)
+```
+
+## 12)
+
+height = 0.3994 \* father + 39.1104
+
+Intercept is actually intercept of line equation.
+
+## 13)
+
+```{r}
+father <- data.frame(father = c(70, 75, 80))
+predict(lm(height ~ father, data = Galton), father)
+```
+
+## 14)
+
+```{r}
+lm(height ~ father + mother, data = Galton)
+Galton
+```
+
+## 15)
+
+normal distribution of residuals
+
+```{r}
+mlr <- lm(height ~ father + mother, data = Galton)
+residuals = Galton$height - predict(mlr, Galton)
+hist(residuals)
+```
+
+## 16)
+
+normal distribution of resudals
+
+```{r}
+qqplot(residuals, rnorm(length(residuals)))
+```
+
+## 17)
+
+Linearity
+
+```{r}
+plot(residuals, Galton$father)
+plot(residuals, Galton$mother)
+```
+
+## 18)
+
+constant variablity
+
+```{r}
+plot(residuals)
+```
+
+## 19 & 20)
+
+It is statistically significant
+
+```{r}
+lm(height ~ father + mother + sex, data = Galton)
+```
+
+## 21)
+
+By this method, we can just remove nkids.
+
+As you can see residuals distribution is almost normal and they have constant variability.
+
+relation between response variable and explanatory variables are linear.
+
+```{r}
+lmr = lm(height ~father + mother + sex, data = Galton)
+residuals = Galton$height - predict(lmr, Galton)
+hist(residuals)
+plot(residuals)
+```
+
+# d) Logistic Regression
+
+## 22)
+
+```{r}
+library(tidyr)
+library(COUNT)
+data("titanic")
+titanic$survived <- ifelse(titanic$survived == 'yes', T, F)
+eq <- glm(survived ~ ., data = titanic, family = binomial(link = 'logit'))
+summary(eq)
+```
+
+## 23)
+
+```{r}
+head(titanic)
+smpl = data.frame(class = c('2nd class'), age = 'adults', sex = 'man')
+predict(eq, smpl, type = 'response')
+```
+
+## 24)
+
+```{r}
+titanic <- droplevels(titanic)
+smpl <- titanic %>% expand(class, age, sex)
+smpl
+smpl$probabilty <- predict(eq, smpl, type = 'response')
+smpl
+```
+
+## 25)
+
+```{r}
+titanic$predicted_survied <- ifelse(predict(eq, titanic, type = 'response') >= 0.5, T, F)
+sum(titanic$survived == titanic$predicted_survied)
+sum(titanic$survived == titanic$predicted_survied) / length(titanic$survived)
+
+```
+
+## 26)
+
+No, it isn't valid, because there should be a lot of equipment to prevent people from dying in the sea after the Titanic accident.
+
+If these two accidents happened at the same time and with the same available equipment, we could predict the number of survivors of second accident by using first accident's data.
